@@ -71,7 +71,7 @@ namespace TelesureHASTest
             {
                 _customLogger.Error("TelesureHASTest", e.Message);
                 _customLogger.Error("TelesureHASTest", e.StackTrace);
-                return new BadRequestResult();
+                return new BadRequestObjectResult("An error occured while processing your request");
             }
 
         }
@@ -101,7 +101,7 @@ namespace TelesureHASTest
             {
                 _customLogger.Error("TelesureHASTest", e.Message);
                 _customLogger.Error("TelesureHASTest", e.StackTrace);
-                return new BadRequestResult();
+                return new BadRequestObjectResult("An error occured while processing your request");
             }
             
         }
@@ -126,13 +126,15 @@ namespace TelesureHASTest
                  })
                  .FirstOrDefault();
 
-                return new OkObjectResult(employee);
+                return employee != null 
+                    ? (ActionResult)new OkObjectResult(employee) 
+                    : new BadRequestObjectResult($"Could not locate employee with Employee Number: {id}");
             }
             catch(Exception e)
             {
                 _customLogger.Error("TelesureHASTest", e.Message);
                 _customLogger.Error("TelesureHASTest", e.StackTrace);
-                return new BadRequestResult();
+                return new BadRequestObjectResult("An error occured while processing your request");
             }
         }
 
@@ -148,19 +150,15 @@ namespace TelesureHASTest
                 HttpRequestMessage newRequest = new HttpRequestMessage(HttpMethod.Get, string.Format("https://jsonplaceholder.typicode.com/todos/{0}", id));
                 HttpResponseMessage response = await httpClient.SendAsync(newRequest);
 
-                if(response.IsSuccessStatusCode) {
-                    return new OkObjectResult(response.Content.ReadAsStringAsync().Result);
-                }
-                else
-                {
-                    return new BadRequestResult();
-                }
+                return response.IsSuccessStatusCode
+                    ? (ActionResult)new OkObjectResult(response.Content.ReadAsStringAsync().Result)
+                    : new BadRequestObjectResult("An error occured while processing your request");
             }
             catch (Exception e)
             {
                 _customLogger.Error("TelesureHASTest", e.Message);
                 _customLogger.Error("TelesureHASTest", e.StackTrace);
-                return new BadRequestResult();
+                return new BadRequestObjectResult("An error occured while processing your request");
             }
         }
 
@@ -171,7 +169,7 @@ namespace TelesureHASTest
         {
             try
             {
-
+                //this is a function to seed database with test data, only execute once
 
                 log.LogInformation("Seeding Database");
 
@@ -272,7 +270,7 @@ namespace TelesureHASTest
             {
                 _customLogger.Error("TelesureHASTest", e.Message);
                 _customLogger.Error("TelesureHASTest", e.StackTrace);
-                return new BadRequestResult();
+                return new BadRequestObjectResult("An error occured while processing your request");
             }
         }
     }
